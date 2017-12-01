@@ -11,6 +11,7 @@ bool isInsideThePolygon(Mypolygon mypolygon, int x, int y);
 bool onSegment(PixelPoint p, PixelPoint q, PixelPoint r);
 void selectShape(int x, int y);
 void pointRotateAroundPoint(PixelPoint &point, PixelPoint center, double angle);
+void pointZoomAroundPoint(PixelPoint &point, PixelPoint center, double ratio);
 
 //内部变量定义
 static PixelPoint startPoint;
@@ -339,13 +340,80 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
         }
         break;
     case zoom:
-
+        if(event->delta() > 0) {
+            switch (selectedShape.shape) {
+            case line:{
+                Line line = lines[selectedShape.index];
+                pointZoomAroundPoint(lines[selectedShape.index].from, line.center, 1.1);
+                pointZoomAroundPoint(lines[selectedShape.index].to, line.center, 1.1);
+                break;
+            }
+            case circle:{
+                Circle circle = circles[selectedShape.index];
+                pointZoomAroundPoint(circles[selectedShape.index].from, circle.center, 1.1);
+                pointZoomAroundPoint(circles[selectedShape.index].to, circle.center, 1.1);
+                circles[selectedShape.index].radius *= 1.1;
+                break;
+            }
+            case oval:{
+                Oval oval = ovals[selectedShape.index];
+                pointZoomAroundPoint(ovals[selectedShape.index].from, oval.center, 1.1);
+                pointZoomAroundPoint(ovals[selectedShape.index].to, oval.center, 1.1);
+                break;
+            }
+            case polygon:
+            case filledPolygon:{
+                Mypolygon *polygon = &mypolygons[selectedShape.index];
+                int num = polygon->points.size();
+                for(int i = 0; i < num; i++) {
+                    pointZoomAroundPoint(polygon->points[i], polygon->center, 1.1);
+                }
+                break;
+            }
+            default:
+                break;
+            }
+        }
+        else {
+            switch (selectedShape.shape) {
+            case line:{
+                Line line = lines[selectedShape.index];
+                pointZoomAroundPoint(lines[selectedShape.index].from, line.center, 0.9);
+                pointZoomAroundPoint(lines[selectedShape.index].to, line.center, 0.9);
+                break;
+            }
+            case circle:{
+                Circle circle = circles[selectedShape.index];
+                pointZoomAroundPoint(circles[selectedShape.index].from, circle.center, 0.9);
+                pointZoomAroundPoint(circles[selectedShape.index].to, circle.center, 0.9);
+                circles[selectedShape.index].radius *= 0.9;
+                break;
+            }
+            case oval:{
+                Oval oval = ovals[selectedShape.index];
+                pointZoomAroundPoint(ovals[selectedShape.index].from, oval.center, 0.9);
+                pointZoomAroundPoint(ovals[selectedShape.index].to, oval.center, 0.9);
+                break;
+            }
+            case polygon:
+            case filledPolygon:{
+                Mypolygon *polygon = &mypolygons[selectedShape.index];
+                int num = polygon->points.size();
+                for(int i = 0; i < num; i++) {
+                    pointZoomAroundPoint(polygon->points[i], polygon->center, 0.9);
+                }
+                break;
+            }
+            default:
+                break;
+            }
+        }
         break;
     default:
         break;
     }
 }
-/***********************************private mathods *************************/
+/***********************************private mathods ****************************************/
 //计算点到直线的距离
 double pointToLine(int x, int y, Line line) {
     double a = line.from.y - line.to.y;
@@ -482,6 +550,17 @@ void pointRotateAroundPoint(PixelPoint &point, PixelPoint center, double angle) 
     int y0 = point.y;
     x = a + (x0-a)*cos(angle) - (y0-b)*sin(angle);
     y = b + (y0-b)*cos(angle) + (x0-a)*sin(angle);
+    point.x = x;
+    point.y = y;
+}
+void pointZoomAroundPoint(PixelPoint &point, PixelPoint center, double ratio){
+    int x, y;
+    int a = center.x;
+    int b = center.y;
+    int x0 = point.x;
+    int y0 = point.y;
+    x = a + (x0-a)*ratio;
+    y = b + (y0-b)*ratio;
     point.x = x;
     point.y = y;
 }
