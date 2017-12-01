@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>images/直线.svg</file>
+        <file>images/圆.svg</file>
+        <file>images/edit.svg</file>
+        <file>images/填充多边形.svg</file>
+        <file>images/多边形.svg</file>
+        <file>images/平移.svg</file>
+        <file>images/旋转.svg</file>
+        <file>images/椭圆.svg</file>
+        <file>images/缩放.svg</file>
+    </qresource>
+</RCC>
