@@ -1,4 +1,5 @@
 #include <glwidget.h>
+#include <cmath>
 using namespace std;
 //全局变量定义
 bool polygonIsDrawing = false;
@@ -9,6 +10,7 @@ double pointToLine(int x, int y, Line line);
 bool isInsideThePolygon(Mypolygon mypolygon, int x, int y);
 bool onSegment(PixelPoint p, PixelPoint q, PixelPoint r);
 void selectShape(int x, int y);
+void pointRotateAroundPoint(PixelPoint &point, PixelPoint center, double angle);
 
 //内部变量定义
 static PixelPoint startPoint;
@@ -17,13 +19,13 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
     int index;
     int x = event->x();
     int y = event->y();
-    //printf("click down\n");
+    //("click down\n");
     switch (currentState) {
     case line:
         index = lines.size()-1;
         lines.push_back(*new Line);
         index++;
-        //printf("Click down\n");
+        //("Click down\n");
         lines[index].from = *new PixelPoint(x, y);
         lines[index].to = lines[index].from;
         break;
@@ -249,8 +251,9 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event) {
     case line:
         index = lines.size()-1;
         lines[index].to = *new PixelPoint(x, y);
-        //printf("click up.There are %d lines\n", index+1);
-        lines[index].center = *new PixelPoint((x + (int)lines[index].from.x)/2, (int)(y + (int)lines[index].to.y)/2);
+        //("click up.There are %d lines\n", index+1);
+        lines[index].center = *new PixelPoint((x + (int)lines[index].from.x)/2, (int)(y + (int)lines[index].from.y)/2);
+        //printf("(%f %f) (%f %f) center(%f %f)\n", lines[index].from.x, lines[index].from.y, lines[index].to.x, lines[index].to.y, lines[index].center.x, lines[index].center.y);
         break;
     case circle: {
         index = circles.size()-1;
@@ -287,7 +290,61 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event) {
         break;
     }
 }
+void GLWidget::wheelEvent(QWheelEvent *event) {
+    if(!selectedShape.isSelected)
+        return;
+    switch (currentState) {
+    case myrotate:
+        if(event->delta() > 0) {
+            switch (selectedShape.shape) {
+            case line:{
+                Line line = lines[selectedShape.index];
+                pointRotateAroundPoint(lines[selectedShape.index].from, line.center, M_PI/18);
+                pointRotateAroundPoint(lines[selectedShape.index].to, line.center, M_PI/18);
+                break;
+            }
+            case polygon:
+            case filledPolygon:{
+                Mypolygon *polygon = &mypolygons[selectedShape.index];
+                int num = polygon->points.size();
+                for(int i = 0; i < num; i++) {
+                    pointRotateAroundPoint(polygon->points[i], polygon->center, M_PI/18);
+                }
+                break;
+            }
+            default:
+                break;
+            }
+        }
+        else {
+            switch (selectedShape.shape) {
+            case line:{
+                Line line = lines[selectedShape.index];
+                pointRotateAroundPoint(lines[selectedShape.index].from, line.center, -M_PI/18);
+                pointRotateAroundPoint(lines[selectedShape.index].to, line.center, -M_PI/18);
+                break;
+            }
+            case polygon:
+            case filledPolygon:{
+                Mypolygon *polygon = &mypolygons[selectedShape.index];
+                int num = polygon->points.size();
+                for(int i = 0; i < num; i++) {
+                    pointRotateAroundPoint(polygon->points[i], polygon->center, -M_PI/18);
+                }
+                break;
+            }
+            default:
+                break;
+            }
+        }
+        break;
+    case zoom:
 
+        break;
+    default:
+        break;
+    }
+}
 /***********************************private mathods *************************/
 //计算点到直线的距离
 double pointToLine(int x, int y, Line line) {
@@ -357,8 +414,8 @@ void selectShape(int x, int y) {
     selectedShape.isSelected = false;
     for(int i = 0; i < (int)lines.size(); i++) {
         double distance = pointToLine(x, y, lines[i]);
-       // printf("%f\n", distance);
-        //printf("%f\n",abs(abs(x-lines[i].from.x)*abs(lines[i].from.y-lines[i].to.y) - abs(lines[i].from.x-lines[i].to.x)*abs(y-lines[i].from.y)));
+       // ("%f\n", distance);
+        //("%f\n",abs(abs(x-lines[i].from.x)*abs(lines[i].from.y-lines[i].to.y) - abs(lines[i].from.x-lines[i].to.x)*abs(y-lines[i].from.y)));
         PixelPoint p(x,y);
         if(distance <= 3 && onSegment(lines[i].from, p, lines[i].to))
         {
@@ -415,4 +472,16 @@ void selectShape(int x, int y) {
             return;
         }
     }
+}
+
+void pointRotateAroundPoint(PixelPoint &point, PixelPoint center, double angle) {
+    int x, y;
+    int a = center.x;
+    int b = center.y;
+    int x0 = point.x;
+    int y0 = point.y;
+    x = a + (x0-a)*cos(angle) - (y0-b)*sin(angle);
+    y = b + (y0-b)*cos(angle) + (x0-a)*sin(angle);
+    point.x = x;
+    point.y = y;
 }
