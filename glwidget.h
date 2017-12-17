@@ -5,6 +5,7 @@
 #include <QOpenGLFunctions>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QKeyEvent>
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
@@ -27,6 +28,7 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 };
 
 //定义像素点
@@ -63,10 +65,17 @@ struct Mypolygon {
     bool whetherFull = false;   //是否填充
     PixelPoint center;
 };
+//定义裁剪矩形结构
+struct Rect {
+    PixelPoint from;
+    PixelPoint to;
+};
+
 //定义绘画状态
 enum CurrentState {
-    line, circle, oval, polygon, filledPolygon, edit, parallel, myrotate, zoom
+    line, circle, oval, polygon, filledPolygon,makeFull, edit, parallel, myrotate, zoom, cut
 };
+
 
 //装图形的容器声明
 extern std::vector <Line> lines;
@@ -74,6 +83,7 @@ extern std::vector <Circle> circles;
 extern std::vector <Oval> ovals;
 extern std::vector <Mypolygon> mypolygons;
 extern CurrentState currentState;
+extern Rect* cutRect;
 
 struct SelectedShape {
     bool isSelected = false;
@@ -92,4 +102,8 @@ void drawCircles();
 void drawOvals();
 void drawMypolygons();
 void drawHighligh();
+void drawCutRect();
+
+void cutLine();
+void cutPolygon();
 #endif // GLWIDGET_H

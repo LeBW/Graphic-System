@@ -9,5 +9,7 @@
         <file>images/旋转.svg</file>
         <file>images/椭圆.svg</file>
         <file>images/缩放.svg</file>
+        <file>images/填充颜色.svg</file>
+        <file>images/裁剪.svg</file>
     </qresource>
 </RCC>

@@ -3,7 +3,9 @@
 
 void drawEightPoint(PixelPoint *current, PixelPoint centre);
 void drawFourPoint(PixelPoint *current, PixelPoint *centre);
-
+int cutTest(float p,float q,float *u1,float *u2);
+void getPoint(std::vector<PixelPoint>& points, float xl, float xr, float yb, float yt);
+void testPoint(std::vector<PixelPoint>& points, int& edg, float xl, float xr, float yb, float yt);
 //填充算法需要用到的一些结构
 //定义活性边表AET和新边表NET
 typedef struct XET
@@ -231,9 +233,66 @@ void drawMypolygon(Mypolygon polygon) {
         glEnd();
     }
 }
+void cutLine() {
+    if (selectedShape.isSelected && cutRect != NULL) {
+        int xwmin = std::min(cutRect->from.x, cutRect->to.x);
+        int xwmax = std::max(cutRect->from.x, cutRect->to.x);
+        int ywmin = std::min(cutRect->from.y, cutRect->to.y);
+        int ywmax = std::max(cutRect->from.y, cutRect->to.y);
+        Line *selectedLine = &lines[selectedShape.index];
+        int x1 = selectedLine->from.x, x2 = selectedLine->to.x, y1 = selectedLine->from.y, y2 = selectedLine->to.y;
+        float u1 = 0, u2 = 1, dx = x2 - x1, dy = y2 - y1;
+        if (cutTest(-dx, x1-xwmin, &u1, &u2) && cutTest(dx, xwmax-x1, &u1, &u2) && cutTest(-dy, y1-ywmin, &u1, &u2) && cutTest(dy, ywmax-y1, &u1, &u2)) {
+            if (u2 < 1) {
+                selectedLine->to.x = x1 + int(u2*dx);
+                selectedLine->to.y = y1 + int(u2*dy);
+            }
+            if(u1 > 0) {
+                selectedLine->from.x = x1 + int(u1*dx);
+                selectedLine->from.y = y1 + int(u1*dy);
+            }
+        }
+        else {
+            std::vector<Line>::iterator lineIterator = lines.begin() + selectedShape.index;
+            lines.erase(lineIterator);
+        }
+    }
+}
+void cutPolygon() {
+    if (selectedShape.isSelected && cutRect != NULL) {
+        int xwmin = std::min(cutRect->from.x, cutRect->to.x);
+        int xwmax = std::max(cutRect->from.x, cutRect->to.x);
+        int ywmin = std::min(cutRect->from.y, cutRect->to.y);
+        int ywmax = std::max(cutRect->from.y, cutRect->to.y);
+        Mypolygon *polygon = &mypolygons[selectedShape.index];
+        getPoint(polygon->points, xwmin, xwmax, ywmin, ywmax);
+    }
+}
 
-
-
+//Private methods
+int cutTest(float p,float q,float *u1,float *u2)
+{
+    int flag = 1; /*flag为标志变量，0：表示舍弃；1：表示可见。*/
+    float r;
+    if (p<0.0){
+        r=q/p;
+        if(r>*u2)
+            flag=0;
+        else if(r>*u1)
+            *u1=r; /*u1取"进入"点的最大参数值*/
+    }
+    else if(p>0.0)
+    {
+        r=q/p;
+        if(r<*u1)
+           flag=0;
+        else if(r<*u2)
+          *u2=r; /*u2取"离开" 点的最小参数值*/
+    }
+    else if(q<0.0) /*p=0，且q<0。平行于边界，而且在界外的线*/
+        flag=0;
+    return(flag);
+}
 void drawEightPoint(PixelPoint *current, PixelPoint centre) {
     PixelPoint *another = new PixelPoint(current->y, current->x);
     glBegin(GL_POINTS);
@@ -305,4 +364,118 @@ void drawHighligh() {
         break;
     }
     glPointSize(1);
+}
+void drawCutRect() {
+    if (cutRect != NULL) {
+        glEnable(GL_LINE_STIPPLE);
+        glLineStipple(2, 0x0f0f);
+        glBegin(GL_LINES);
+        glVertex2f(cutRect->from.x, cutRect->from.y);
+        glVertex2f(cutRect->from.x, cutRect->to.y);
+        glVertex2f(cutRect->from.x, cutRect->to.y);
+        glVertex2f(cutRect->to.x, cutRect->to.y);
+        glVertex2f(cutRect->to.x, cutRect->to.y);
+        glVertex2f(cutRect->to.x, cutRect->from.y);
+        glVertex2f(cutRect->to.x, cutRect->from.y);
+        glVertex2f(cutRect->from.x, cutRect->from.y);
+        glEnd();
+       // glRectd(cutRect->from.x, cutRect->from.y, cutRect->to.x, cutRect->to.y);
+    }
+}
+void getPoint(std::vector<PixelPoint>& points, float xl, float xr, float yb, float yt) {
+    int n = 0;
+    testPoint(points, n, xl, xr, yb, yt);
+}
+void testPoint(std::vector<PixelPoint>& points, int &edg, float xl, float xr, float yb, float yt) {
+    if(edg == 4)
+        return;
+    int p = 0, q = 1;
+    int num = points.size() - 1;
+    std::vector<PixelPoint> result;
+    while(q <= num) {
+        switch (edg) {
+        case 0:
+            //左边界裁剪
+            if (points[p].x < xl && points[q].x >= xl) {
+                double k = (points[q].y - points[p].y)/(points[q].x - points[p].x);
+                int y = points[p].y + int(k*(xl-points[p].x));
+                result.push_back(*new PixelPoint(xl, y));
+                result.push_back(points[q]);
+            }
+            else if(points[p].x >= xl && points[q].x >= xl) {
+                result.push_back(points[q]);
+            }
+            else if(points[p].x >= xl && points[q].x < xl) {
+                double k = (points[q].y - points[p].y)/(points[q].x - points[p].x);
+                int y = points[p].y + int(k*(xl-points[p].x));
+                result.push_back(*new PixelPoint(xl, y));
+            }
+            else if(points[p].x < xl && points[q].x < xl) {
+                //不增加任何点
+            }
+            break;
+        case 1:
+            if (points[p].y > yt && points[q].y <= yt) {
+                double m = (points[q].x - points[p].x) / (points[q].y - points[p].y);
+                int x = points[p].x + int(m*(yt-points[p].y));
+                result.push_back(*new PixelPoint(x, yt));
+                result.push_back(points[q]);
+            }
+            else if(points[p].y <= yt && points[q].y <= yt) {
+                result.push_back(points[q]);
+            }
+            else if(points[p].y <= yt && points[q].y > yt) {
+                double m = (points[q].x - points[p].x) / (points[q].y - points[p].y);
+                int x = points[p].x + int(m*(yt-points[p].y));
+                result.push_back(*new PixelPoint(x, yt));
+            }
+            else if(points[p].y > yt && points[q].y > yt) {
+                //不增加任何点
+            }
+            break;
+        case 2:
+            if (points[p].x > xr && points[q].x <= xr) {
+                double k = (points[q].y - points[p].y)/(points[q].x - points[p].x);
+                int y = points[p].y + int(k*(xr-points[p].x));
+                result.push_back(*new PixelPoint(xr, y));
+                result.push_back(points[q]);
+            }
+            else if(points[p].x <= xr && points[q].x <= xr) {
+                result.push_back(points[q]);
+            }
+            else if(points[p].x <= xr && points[q].x > xr) {
+                double k = (points[q].y - points[p].y)/(points[q].x - points[p].x);
+                int y = points[p].y + int(k*(xr-points[p].x));
+                result.push_back(*new PixelPoint(xr, y));
+            }
+            else if(points[p].x > xr && points[q].x > xr) {
+                //不增加任何点
+            }
+            break;
+        case 3:
+            if (points[p].y < yb && points[q].y >= yb) {
+                double m = (points[q].x - points[p].x) / (points[q].y - points[p].y);
+                int x = points[p].x + int(m*(yb-points[p].y));
+                result.push_back(*new PixelPoint(x, yb));
+                result.push_back(points[q]);
+            }
+            else if(points[p].y >= yb && points[q].y >= yb) {
+                result.push_back(points[q]);
+            }
+            else if(points[p].y >= yb && points[q].y < yb) {
+                double m = (points[q].x - points[p].x) / (points[q].y - points[p].y);
+                int x = points[p].x + int(m*(yb-points[p].y));
+                result.push_back(*new PixelPoint(x, yb));
+            }
+            else if(points[p].y < yb && points[q].y < yb) {
+                //不增加任何点
+            }
+            break;
+        }
+        p++;q++;
+    }
+    points = result;
+    points.push_back(points[0]);
+    edg++;
+    testPoint(points, edg, xl, xr, yb, yt);
 }

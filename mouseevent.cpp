@@ -21,6 +21,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
     int x = event->x();
     int y = event->y();
     //("click down\n");
+    delete cutRect;
+    cutRect = NULL;
     switch (currentState) {
     case line:
         index = lines.size()-1;
@@ -99,6 +101,19 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
             }
         }
         break;
+    case makeFull:
+        if(event->button() == Qt::LeftButton) {
+            selectShape(x, y);
+        }
+        if (selectedShape.isSelected == true && selectedShape.shape == polygon)
+        {
+            //mypolygons[selectedShape.index].whetherFull = ~mypolygons[selectedShape.index].whetherFull;
+            if(mypolygons[selectedShape.index].whetherFull)
+                mypolygons[selectedShape.index].whetherFull = false;
+            else
+                mypolygons[selectedShape.index].whetherFull = true;
+        }
+        break;
     case edit:
         if(event->button() == Qt::LeftButton) {
             //左键选中图形
@@ -148,6 +163,15 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
         break;
     case zoom:
         selectShape(x, y);
+        break;
+    case cut:
+        if (event->button() == Qt::LeftButton)
+            selectShape(x, y);
+        else if(event->button() == Qt::RightButton && selectedShape.isSelected && (selectedShape.shape == line || selectedShape.shape == polygon) ){
+            cutRect = new Rect();
+            cutRect->from = *new PixelPoint(x, y);
+            cutRect->to = *new PixelPoint(x, y);
+        }
         break;
     }
 }
@@ -242,6 +266,20 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
             break;
         }
     }
+    else if (event->buttons() == Qt::RightButton) {
+        int x = event->x();
+        int y = event->y();
+        switch (currentState) {
+        case cut:
+            if(cutRect != NULL) {
+              cutRect->to.x = x;
+              cutRect->to.y = y;
+            }
+            break;
+        default:
+            break;
+        }
+    }
 
 }
 void GLWidget::mouseReleaseEvent(QMouseEvent *event) {
@@ -286,6 +324,12 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event) {
         index = ovals.size() - 1;
         ovals[index].to = *new PixelPoint(x, y);
         ovals[index].center = *new PixelPoint((x+ovals[index].from.x)/2, (y+ovals[index].from.y)/2);
+        break;
+    case cut:
+        if (event->button() == Qt::RightButton && cutRect != NULL) {
+            cutRect->to.x = x;
+            cutRect->to.y = y;
+        }
         break;
     default:
         break;
@@ -413,6 +457,36 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
         break;
     }
 }
+void GLWidget::keyPressEvent(QKeyEvent *event) {
+    switch (currentState) {
+    case cut:
+        if(cutRect != NULL) {
+            if(event->key() == Qt::Key_Escape)  {
+                delete cutRect;
+                cutRect = NULL;
+            }
+            else if(event->key() == Qt::Key_Return) {
+                switch(selectedShape.shape) {
+                case line:
+                    cutLine();
+                    break;
+                case polygon:
+                    cutPolygon();
+                    break;
+                default:
+                    break;
+                }
+                delete cutRect;
+                cutRect = NULL;
+            }
+        }
+        selectedShape.isSelected = false;
+        break;
+    default:
+        break;
+    }
+}
+
 /***********************************private mathods ****************************************/
 //计算点到直线的距离
 double pointToLine(int x, int y, Line line) {

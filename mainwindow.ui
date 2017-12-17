@@ -77,11 +77,13 @@
    <addaction name="actionoval"/>
    <addaction name="actionpolygon"/>
    <addaction name="actionfilledPolygon"/>
+   <addaction name="actionmakeFull"/>
    <addaction name="separator"/>
    <addaction name="actionEdit"/>
    <addaction name="actionparallel"/>
    <addaction name="actionrotate"/>
    <addaction name="actionzoom"/>
+   <addaction name="actioncut"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="toolTip">
@@ -170,6 +172,24 @@
    </property>
    <property name="text">
     <string>zoom</string>
+   </property>
+  </action>
+  <action name="actionmakeFull">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/images/填充颜色.svg</normaloff>:/icon/images/填充颜色.svg</iconset>
+   </property>
+   <property name="text">
+    <string>makeFull</string>
+   </property>
+  </action>
+  <action name="actioncut">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/images/裁剪.svg</normaloff>:/icon/images/裁剪.svg</iconset>
+   </property>
+   <property name="text">
+    <string>cut</string>
    </property>
   </action>
  </widget>

@@ -34,6 +34,10 @@ private slots:
 
     void on_actionzoom_triggered();
 
+    void on_actionmakeFull_triggered();
+
+    void on_actioncut_triggered();
+
 private:
     Ui::MainWindow *ui;
 };

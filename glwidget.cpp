@@ -8,7 +8,7 @@ GLWidget::GLWidget(QWidget *parent): QOpenGLWidget(parent)
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(10);
-
+    setFocusPolicy(Qt::StrongFocus);
    //QMetaObject::invokeMethod(this,"updateGL",Qt::QueuedConnection);
 }
 void GLWidget::initializeGL() {
@@ -29,6 +29,7 @@ void GLWidget::paintGL() {
     drawCircles();
     drawOvals();
     drawMypolygons();
+    drawCutRect();
     if(selectedShape.isSelected == true)
         drawHighligh();
 }
