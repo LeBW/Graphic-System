@@ -30,6 +30,17 @@ public:
     void wheelEvent(QWheelEvent *event);
     void keyPressEvent(QKeyEvent *event);
 };
+class ThreeDimensionWidget: public QOpenGLWidget, protected QOpenGLFunctions {
+public:
+    explicit ThreeDimensionWidget(QWidget *parent = 0);
+
+    void initializeGL();
+    void paintGL();
+
+    void drawCube();
+
+    float xrot = 0, yrot = 0, zrot = 0;
+};
 
 //定义像素点
 class PixelPoint{
@@ -73,9 +84,8 @@ struct Rect {
 
 //定义绘画状态
 enum CurrentState {
-    line, circle, oval, polygon, filledPolygon,makeFull, edit, parallel, myrotate, zoom, cut
+    line, circle, oval, polygon, filledPolygon,makeFull, edit, parallel, myrotate, zoom, cut, threeDimension
 };
-
 
 //装图形的容器声明
 extern std::vector <Line> lines;
@@ -84,6 +94,7 @@ extern std::vector <Oval> ovals;
 extern std::vector <Mypolygon> mypolygons;
 extern CurrentState currentState;
 extern Rect* cutRect;
+
 
 struct SelectedShape {
     bool isSelected = false;

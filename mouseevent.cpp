@@ -173,6 +173,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
             cutRect->to = *new PixelPoint(x, y);
         }
         break;
+    default:
+        break;
     }
 }
 

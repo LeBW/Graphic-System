@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Graphic System</string>
   </property>
-  <widget class="QWidget" name="centralWidget">
+  <widget class="GLWidget" name="centralWidget">
    <widget class="GLWidget" name="widget" native="true">
     <property name="enabled">
      <bool>true</bool>
@@ -84,6 +84,8 @@
    <addaction name="actionrotate"/>
    <addaction name="actionzoom"/>
    <addaction name="actioncut"/>
+   <addaction name="separator"/>
+   <addaction name="action3D"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="toolTip">
@@ -190,6 +192,15 @@
    </property>
    <property name="text">
     <string>cut</string>
+   </property>
+  </action>
+  <action name="action3D">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/images/3d.svg</normaloff>:/icon/images/3d.svg</iconset>
+   </property>
+   <property name="text">
+    <string>3D</string>
    </property>
   </action>
  </widget>

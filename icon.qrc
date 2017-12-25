@@ -11,5 +11,6 @@
         <file>images/缩放.svg</file>
         <file>images/填充颜色.svg</file>
         <file>images/裁剪.svg</file>
+        <file>images/3d.svg</file>
     </qresource>
 </RCC>

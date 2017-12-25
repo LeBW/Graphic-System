@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <glwidget.h>
 
 namespace Ui {
 class MainWindow;
@@ -13,6 +14,8 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    GLWidget *glWidget = new GLWidget();
+   // ThreeDimensionWidget *threeDimensionWidget = new ThreeDimensionWidget();
     ~MainWindow();
 
 private slots:
@@ -37,6 +40,8 @@ private slots:
     void on_actionmakeFull_triggered();
 
     void on_actioncut_triggered();
+
+    void on_action3D_triggered();
 
 private:
     Ui::MainWindow *ui;

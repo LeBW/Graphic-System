@@ -120,3 +120,25 @@ void MainWindow::on_actioncut_triggered()
         cutRect = NULL;
     }
 }
+
+void MainWindow::on_action3D_triggered()
+{
+    if(cutRect != NULL) {
+        delete cutRect;
+        cutRect = NULL;
+    }
+
+    if (currentState != threeDimension) {
+        currentState = threeDimension;
+        //3D显示的必要初始化
+        //glWidget->initializeFor3D();
+        setCentralWidget(new ThreeDimensionWidget());
+    }
+    else {
+        currentState = line;
+        //回到2D的必要初始化
+       // glWidget->initializeFor2D();
+        setCentralWidget(new GLWidget());
+    }
+
+}
