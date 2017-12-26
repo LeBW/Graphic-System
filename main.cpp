@@ -9,6 +9,7 @@ vector<Line> lines;
 vector<Circle> circles;
 vector<Oval> ovals;
 vector<Mypolygon> mypolygons;
+vector<Mypolygon> curves;
 CurrentState currentState = line; //初始状态画直线
 Rect* cutRect = NULL;
 

@@ -52,6 +52,7 @@
     <addaction name="actionoval"/>
     <addaction name="actionpolygon"/>
     <addaction name="actionfilledPolygon"/>
+    <addaction name="actionbezierCurve"/>
    </widget>
    <widget class="QMenu" name="menuMode">
     <property name="title">
@@ -61,6 +62,7 @@
     <addaction name="actionparallel"/>
     <addaction name="actionrotate"/>
     <addaction name="actionzoom"/>
+    <addaction name="actionsave"/>
    </widget>
    <addaction name="menuDraw"/>
    <addaction name="menuMode"/>
@@ -77,8 +79,9 @@
    <addaction name="actionoval"/>
    <addaction name="actionpolygon"/>
    <addaction name="actionfilledPolygon"/>
-   <addaction name="actionmakeFull"/>
+   <addaction name="actionbezierCurve"/>
    <addaction name="separator"/>
+   <addaction name="actionmakeFull"/>
    <addaction name="actionEdit"/>
    <addaction name="actionparallel"/>
    <addaction name="actionrotate"/>
@@ -86,6 +89,8 @@
    <addaction name="actioncut"/>
    <addaction name="separator"/>
    <addaction name="action3D"/>
+   <addaction name="separator"/>
+   <addaction name="actionsave"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="toolTip">
@@ -201,6 +206,24 @@
    </property>
    <property name="text">
     <string>3D</string>
+   </property>
+  </action>
+  <action name="actionsave">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/images/保存.svg</normaloff>:/icon/images/保存.svg</iconset>
+   </property>
+   <property name="text">
+    <string>save</string>
+   </property>
+  </action>
+  <action name="actionbezierCurve">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/images/曲线.svg</normaloff>:/icon/images/曲线.svg</iconset>
+   </property>
+   <property name="text">
+    <string>bezierCurve</string>
    </property>
   </action>
  </widget>

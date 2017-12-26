@@ -109,7 +109,7 @@ static void bresenhamDrawOval(PixelPoint from, PixelPoint to) {
 
     }
 }
-void drawMypolygon(Mypolygon polygon) {
+static void drawMypolygon(Mypolygon polygon) {
     std::vector<PixelPoint> points = polygon.points;
     int num = points.size();
     if (num == 1) {
@@ -267,6 +267,33 @@ void cutPolygon() {
         Mypolygon *polygon = &mypolygons[selectedShape.index];
         getPoint(polygon->points, xwmin, xwmax, ywmin, ywmax);
     }
+}
+PixelPoint getBezierPoint(std::vector<PixelPoint> points, int numPoints, double t) {
+    std::vector<PixelPoint> tmp = points;
+    int i = numPoints - 1;
+    while( i > 0) {
+        for(int k = 0; k < i; k++) {
+            tmp[k].x = tmp[k].x + t * ( tmp[k+1].x - tmp[k].x);
+            tmp[k].y = tmp[k].y + t * ( tmp[k+1].y - tmp[k].y);
+        }
+        i--;
+    }
+    PixelPoint answer = tmp[0];
+    return answer;
+}
+
+void drawCurve(Mypolygon *curve) {
+    int numPoints = curve->points.size();
+    double t = 0;
+    std::vector<PixelPoint> bezierPoints;
+    for(; t <= 1; t += 0.001) {
+        bezierPoints.push_back(getBezierPoint(curve->points, numPoints, t));
+    }
+    glBegin(GL_POINTS);
+    for(int i = 0; i < 1001; i++) {
+        glVertex2d(bezierPoints[i].x, bezierPoints[i].y);
+    }
+    glEnd();
 }
 
 //Private methods
@@ -478,4 +505,22 @@ void testPoint(std::vector<PixelPoint>& points, int &edg, float xl, float xr, fl
     points.push_back(points[0]);
     edg++;
     testPoint(points, edg, xl, xr, yb, yt);
+}
+
+void drawAuxiliaryLine() {
+    int index = curves.size() - 1;
+    int num = curves[index].points.size();
+    glLineStipple(2, 0x5555);
+    glEnable(GL_LINE_STIPPLE);
+    glBegin(GL_LINE_STRIP);
+    for(int i = 0; i < num; i++) {
+        glVertex2d(curves[index].points[i].x, curves[index].points[i].y);
+    }
+    glEnd();
+    glDisable(GL_LINE_STIPPLE);
+}
+void drawCurves() {
+    for(int i = 0; i < (int)curves.size(); i++) {
+        drawCurve(&curves[i]);
+    }
 }

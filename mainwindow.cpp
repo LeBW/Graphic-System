@@ -142,3 +142,22 @@ void MainWindow::on_action3D_triggered()
     }
 
 }
+
+void MainWindow::on_actionsave_triggered()
+{
+    if (currentState != threeDimension) {
+        GLWidget *widget = (GLWidget*)centralWidget();
+        widget->saveImage();
+    }
+}
+
+void MainWindow::on_actionbezierCurve_triggered()
+{
+    currentState = curve;
+    selectedShape.isSelected = false;
+    curveIsDrawing = false;
+    if(cutRect != NULL) {
+        delete cutRect;
+        cutRect = NULL;
+    }
+}

@@ -43,6 +43,10 @@ private slots:
 
     void on_action3D_triggered();
 
+    void on_actionsave_triggered();
+
+    void on_actionbezierCurve_triggered();
+
 private:
     Ui::MainWindow *ui;
 };

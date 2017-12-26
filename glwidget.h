@@ -29,6 +29,11 @@ public:
     void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void keyPressEvent(QKeyEvent *event);
+    //保存图片用的函数
+    void saveImage();
+    void ppmWriter(unsigned char* in, char *name, int dimx, int dimy);
+private:
+    int nbm = 0;
 };
 class ThreeDimensionWidget: public QOpenGLWidget, protected QOpenGLFunctions {
 public:
@@ -84,7 +89,7 @@ struct Rect {
 
 //定义绘画状态
 enum CurrentState {
-    line, circle, oval, polygon, filledPolygon,makeFull, edit, parallel, myrotate, zoom, cut, threeDimension
+    line, circle, oval, polygon, filledPolygon, curve, makeFull, edit, parallel, myrotate, zoom, cut, threeDimension
 };
 
 //装图形的容器声明
@@ -92,6 +97,8 @@ extern std::vector <Line> lines;
 extern std::vector <Circle> circles;
 extern std::vector <Oval> ovals;
 extern std::vector <Mypolygon> mypolygons;
+extern std::vector <Mypolygon> curves;
+
 extern CurrentState currentState;
 extern Rect* cutRect;
 
@@ -104,6 +111,8 @@ struct SelectedShape {
 
 
 extern bool polygonIsDrawing;
+extern bool curveIsDrawing;
+
 extern SelectedShape selectedShape;
 
 
@@ -114,6 +123,8 @@ void drawOvals();
 void drawMypolygons();
 void drawHighligh();
 void drawCutRect();
+void drawAuxiliaryLine();
+void drawCurves();
 
 void cutLine();
 void cutPolygon();

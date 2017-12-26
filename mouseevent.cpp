@@ -3,6 +3,8 @@
 using namespace std;
 //全局变量定义
 bool polygonIsDrawing = false;
+bool curveIsDrawing = false;
+
 SelectedShape selectedShape;
 
 //definition of private methods
@@ -70,6 +72,33 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
                 centerY /= num;
                 mypolygons[index].center.x = centerX;
                 mypolygons[index].center.y = centerY;
+            }
+        }
+        break;
+    case curve:
+        if(event->button() == Qt::LeftButton) {
+            //这里直接polygonIsDrawing，因为Bezier曲线的绘制实际上也就是选一系列的控制点，也多边形绘制类似
+            if(!curveIsDrawing) {
+                curves.push_back(*new Mypolygon());
+                curveIsDrawing = true;
+            }
+            index = curves.size() - 1;
+            curves[index].points.push_back(*new PixelPoint(x, y));
+        }
+        else if(event->button() == Qt::RightButton) {
+            if(curveIsDrawing) {
+                index = curves.size() - 1;
+                int num = curves[index].points.size();
+                curveIsDrawing = false;
+                int centerX = 0, centerY = 0;
+                for(int i = 0; i < num; i++) {
+                    centerX += curves[index].points[i].x;
+                    centerY += curves[index].points[i].y;
+                }
+                centerX /= num;
+                centerY /= num;
+                curves[index].center.x = centerX;
+                curves[index].center.y = centerY;
             }
         }
         break;
