@@ -89,7 +89,7 @@ struct Rect {
 
 //定义绘画状态
 enum CurrentState {
-    line, circle, oval, polygon, filledPolygon, curve, makeFull, edit, parallel, myrotate, zoom, cut, threeDimension
+    line, circle, oval, polygon, filledPolygon, bezierCurve, bSplineCurve, makeFull, edit, parallel, myrotate, zoom, cut, threeDimension
 };
 
 //装图形的容器声明
@@ -97,7 +97,8 @@ extern std::vector <Line> lines;
 extern std::vector <Circle> circles;
 extern std::vector <Oval> ovals;
 extern std::vector <Mypolygon> mypolygons;
-extern std::vector <Mypolygon> curves;
+extern std::vector <Mypolygon> bezierCurves;
+extern std::vector <Mypolygon> bsplineCurves;
 
 extern CurrentState currentState;
 extern Rect* cutRect;
@@ -124,7 +125,8 @@ void drawMypolygons();
 void drawHighligh();
 void drawCutRect();
 void drawAuxiliaryLine();
-void drawCurves();
+void drawBezierCurves();
+void drawBSplineCurves();
 
 void cutLine();
 void cutPolygon();

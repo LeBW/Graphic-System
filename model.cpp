@@ -6,6 +6,7 @@ void drawFourPoint(PixelPoint *current, PixelPoint *centre);
 int cutTest(float p,float q,float *u1,float *u2);
 void getPoint(std::vector<PixelPoint>& points, float xl, float xr, float yb, float yt);
 void testPoint(std::vector<PixelPoint>& points, int& edg, float xl, float xr, float yb, float yt);
+void drawCurve(PixelPoint p1, PixelPoint p2, PixelPoint p3);
 //填充算法需要用到的一些结构
 //定义活性边表AET和新边表NET
 typedef struct XET
@@ -281,22 +282,46 @@ PixelPoint getBezierPoint(std::vector<PixelPoint> points, int numPoints, double 
     PixelPoint answer = tmp[0];
     return answer;
 }
-
-void drawCurve(Mypolygon *curve) {
+//画bezier曲线算法
+void drawBezierCurve(Mypolygon *curve) {
     int numPoints = curve->points.size();
     double t = 0;
     std::vector<PixelPoint> bezierPoints;
     for(; t <= 1; t += 0.001) {
         bezierPoints.push_back(getBezierPoint(curve->points, numPoints, t));
     }
-    glBegin(GL_POINTS);
-    for(int i = 0; i < 1001; i++) {
+    glBegin(GL_LINE_STRIP);
+    for(int i = 0; i < 1000; i++) {
         glVertex2d(bezierPoints[i].x, bezierPoints[i].y);
     }
     glEnd();
 }
+//画B样条曲线算法
+void drawBSplineCurve(Mypolygon *curve) {
+    int numPoints = curve->points.size();
+    if(numPoints < 2)
+        return;
+    for(int i = 0; i < numPoints - 2; i++) {
+        drawCurve(curve->points[i], curve->points[i+1], curve->points[i+2]);
+    }
+}
 
 //Private methods
+void drawCurve(PixelPoint p1, PixelPoint p2, PixelPoint p3) {
+    std::vector<PixelPoint> points;
+    for(double t = 0; t <= 1.01; t += 0.01) {
+        double a1 = pow(1-t, 2)/2;
+        double a2 = (1 + 2 * t - 2 * t*t)/2;
+        double a3 =  t*t/2;
+        points.push_back(*new PixelPoint(a1*p1.x + a2*p2.x + a3*p3.x, a1*p1.y + a2*p2.y + a3*p3.y));
+    }
+    glBegin(GL_LINE_STRIP);
+    for(int i = 0; i <= 100; i++) {
+        glVertex2d(points[i].x, points[i].y);
+    }
+    glEnd();
+}
+
 int cutTest(float p,float q,float *u1,float *u2)
 {
     int flag = 1; /*flag为标志变量，0：表示舍弃；1：表示可见。*/
@@ -386,6 +411,9 @@ void drawHighligh() {
     case polygon:
     case filledPolygon:
         drawMypolygon(mypolygons[selectedShape.index]);
+        break;
+    case bezierCurve:
+        drawBezierCurve(&bezierCurves[selectedShape.index] );
         break;
     default:
         break;
@@ -508,19 +536,38 @@ void testPoint(std::vector<PixelPoint>& points, int &edg, float xl, float xr, fl
 }
 
 void drawAuxiliaryLine() {
-    int index = curves.size() - 1;
-    int num = curves[index].points.size();
-    glLineStipple(2, 0x5555);
-    glEnable(GL_LINE_STIPPLE);
-    glBegin(GL_LINE_STRIP);
-    for(int i = 0; i < num; i++) {
-        glVertex2d(curves[index].points[i].x, curves[index].points[i].y);
+    if (currentState == bezierCurve) {
+        int index = bezierCurves.size() - 1;
+        int num = bezierCurves[index].points.size();
+        glLineStipple(2, 0x5555);
+        glEnable(GL_LINE_STIPPLE);
+        glBegin(GL_LINE_STRIP);
+        for(int i = 0; i < num; i++) {
+            glVertex2d(bezierCurves[index].points[i].x, bezierCurves[index].points[i].y);
+        }
+        glEnd();
+        glDisable(GL_LINE_STIPPLE);
     }
-    glEnd();
-    glDisable(GL_LINE_STIPPLE);
+    else if( currentState == bSplineCurve) {
+        int index = bsplineCurves.size() - 1;
+        int num = bsplineCurves[index].points.size();
+        glLineStipple(2, 0x5555);
+        glEnable(GL_LINE_STIPPLE);
+        glBegin(GL_LINE_STRIP);
+        for(int i = 0; i < num; i++) {
+            glVertex2d(bsplineCurves[index].points[i].x, bsplineCurves[index].points[i].y);
+        }
+        glEnd();
+        glDisable(GL_LINE_STIPPLE);
+    }
 }
-void drawCurves() {
-    for(int i = 0; i < (int)curves.size(); i++) {
-        drawCurve(&curves[i]);
+void drawBezierCurves() {
+    for(int i = 0; i < (int)bezierCurves.size(); i++) {
+        drawBezierCurve(&bezierCurves[i]);
+    }
+}
+void drawBSplineCurves() {
+    for(int i = 0; i < (int)bsplineCurves.size(); i++) {
+        drawBSplineCurve(&bsplineCurves[i]);
     }
 }

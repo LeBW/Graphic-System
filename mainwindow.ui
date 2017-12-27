@@ -53,6 +53,7 @@
     <addaction name="actionpolygon"/>
     <addaction name="actionfilledPolygon"/>
     <addaction name="actionbezierCurve"/>
+    <addaction name="actionbSplineCurve"/>
    </widget>
    <widget class="QMenu" name="menuMode">
     <property name="title">
@@ -80,6 +81,7 @@
    <addaction name="actionpolygon"/>
    <addaction name="actionfilledPolygon"/>
    <addaction name="actionbezierCurve"/>
+   <addaction name="actionbSplineCurve"/>
    <addaction name="separator"/>
    <addaction name="actionmakeFull"/>
    <addaction name="actionEdit"/>
@@ -224,6 +226,15 @@
    </property>
    <property name="text">
     <string>bezierCurve</string>
+   </property>
+  </action>
+  <action name="actionbSplineCurve">
+   <property name="icon">
+    <iconset resource="icon.qrc">
+     <normaloff>:/icon/images/曲线图.svg</normaloff>:/icon/images/曲线图.svg</iconset>
+   </property>
+   <property name="text">
+    <string>bSplineCurve</string>
    </property>
   </action>
  </widget>

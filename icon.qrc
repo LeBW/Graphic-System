@@ -14,5 +14,6 @@
         <file>images/3d.svg</file>
         <file>images/保存.svg</file>
         <file>images/曲线.svg</file>
+        <file>images/曲线图.svg</file>
     </qresource>
 </RCC>

@@ -153,7 +153,18 @@ void MainWindow::on_actionsave_triggered()
 
 void MainWindow::on_actionbezierCurve_triggered()
 {
-    currentState = curve;
+    currentState = bezierCurve;
+    selectedShape.isSelected = false;
+    curveIsDrawing = false;
+    if(cutRect != NULL) {
+        delete cutRect;
+        cutRect = NULL;
+    }
+}
+
+void MainWindow::on_actionbSplineCurve_triggered()
+{
+    currentState = bSplineCurve;
     selectedShape.isSelected = false;
     curveIsDrawing = false;
     if(cutRect != NULL) {

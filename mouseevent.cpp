@@ -75,30 +75,57 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
             }
         }
         break;
-    case curve:
+    case bezierCurve:
         if(event->button() == Qt::LeftButton) {
             //这里直接polygonIsDrawing，因为Bezier曲线的绘制实际上也就是选一系列的控制点，也多边形绘制类似
             if(!curveIsDrawing) {
-                curves.push_back(*new Mypolygon());
+                bezierCurves.push_back(*new Mypolygon());
                 curveIsDrawing = true;
             }
-            index = curves.size() - 1;
-            curves[index].points.push_back(*new PixelPoint(x, y));
+            index = bezierCurves.size() - 1;
+            bezierCurves[index].points.push_back(*new PixelPoint(x, y));
         }
         else if(event->button() == Qt::RightButton) {
             if(curveIsDrawing) {
-                index = curves.size() - 1;
-                int num = curves[index].points.size();
+                index = bezierCurves.size() - 1;
+                int num = bezierCurves[index].points.size();
                 curveIsDrawing = false;
                 int centerX = 0, centerY = 0;
                 for(int i = 0; i < num; i++) {
-                    centerX += curves[index].points[i].x;
-                    centerY += curves[index].points[i].y;
+                    centerX += bezierCurves[index].points[i].x;
+                    centerY += bezierCurves[index].points[i].y;
                 }
                 centerX /= num;
                 centerY /= num;
-                curves[index].center.x = centerX;
-                curves[index].center.y = centerY;
+                bezierCurves[index].center.x = centerX;
+                bezierCurves[index].center.y = centerY;
+            }
+        }
+        break;
+    case bSplineCurve:
+        if(event->button() == Qt::LeftButton) {
+            //这里直接polygonIsDrawing，因为Bezier曲线的绘制实际上也就是选一系列的控制点，也多边形绘制类似
+            if(!curveIsDrawing) {
+                bsplineCurves.push_back(*new Mypolygon());
+                curveIsDrawing = true;
+            }
+            index = bsplineCurves.size() - 1;
+            bsplineCurves[index].points.push_back(*new PixelPoint(x, y));
+        }
+        else if(event->button() == Qt::RightButton) {
+            if(curveIsDrawing) {
+                index = bsplineCurves.size() - 1;
+                int num = bsplineCurves[index].points.size();
+                curveIsDrawing = false;
+                int centerX = 0, centerY = 0;
+                for(int i = 0; i < num; i++) {
+                    centerX += bsplineCurves[index].points[i].x;
+                    centerY += bsplineCurves[index].points[i].y;
+                }
+                centerX /= num;
+                centerY /= num;
+                bsplineCurves[index].center.x = centerX;
+                bsplineCurves[index].center.y = centerY;
             }
         }
         break;
@@ -170,6 +197,11 @@ void GLWidget::mousePressEvent(QMouseEvent *event) {
                 case polygon: {
                     vector<Mypolygon>::iterator polygonIterator = mypolygons.begin() + selectedShape.index;
                     mypolygons.erase(polygonIterator);
+                    break;
+                }
+                case bezierCurve: {
+                    vector<Mypolygon>::iterator bezierCurveIterator = bezierCurves.begin() + selectedShape.index;
+                    bezierCurves.erase(bezierCurveIterator);
                     break;
                 }
                 default:
@@ -288,6 +320,15 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
                     mypolygons[selectedShape.index].center.x += deltaX;
                     mypolygons[selectedShape.index].center.y += deltaY;
                     break;
+                case bezierCurve:
+                    n = bezierCurves[selectedShape.index].points.size();
+                    for(int i = 0; i < n; i++) {
+                        bezierCurves[selectedShape.index].points[i].x += deltaX;
+                        bezierCurves[selectedShape.index].points[i].y += deltaY;
+                    }
+                    bezierCurves[selectedShape.index].center.x += deltaX;
+                    bezierCurves[selectedShape.index].center.y += deltaY;
+                    break;
                 default:
                     break;
                 }
@@ -388,6 +429,14 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
                 }
                 break;
             }
+            case bezierCurve: {
+                Mypolygon *bezierCurve = &bezierCurves[selectedShape.index];
+                int num = bezierCurve->points.size();
+                for(int i = 0; i < num; i++) {
+                    pointRotateAroundPoint(bezierCurve->points[i], bezierCurve->center, M_PI/18);
+                }
+                break;
+            }
             default:
                 break;
             }
@@ -406,6 +455,14 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
                 int num = polygon->points.size();
                 for(int i = 0; i < num; i++) {
                     pointRotateAroundPoint(polygon->points[i], polygon->center, -M_PI/18);
+                }
+                break;
+            }
+            case bezierCurve: {
+                Mypolygon *bezierCurve = &bezierCurves[selectedShape.index];
+                int num = bezierCurve->points.size();
+                for(int i = 0; i < num; i++) {
+                    pointRotateAroundPoint(bezierCurve->points[i], bezierCurve->center, -M_PI/18);
                 }
                 break;
             }
@@ -445,6 +502,14 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
                 }
                 break;
             }
+            case bezierCurve: {
+                Mypolygon *bezierCurve = &bezierCurves[selectedShape.index];
+                int num = bezierCurve->points.size();
+                for(int i = 0; i < num; i++) {
+                    pointZoomAroundPoint(bezierCurve->points[i], bezierCurve->center, 1.1);
+                }
+                break;
+            }
             default:
                 break;
             }
@@ -476,6 +541,14 @@ void GLWidget::wheelEvent(QWheelEvent *event) {
                 int num = polygon->points.size();
                 for(int i = 0; i < num; i++) {
                     pointZoomAroundPoint(polygon->points[i], polygon->center, 0.9);
+                }
+                break;
+            }
+            case bezierCurve: {
+                Mypolygon *bezierCurve = &bezierCurves[selectedShape.index];
+                int num = bezierCurve->points.size();
+                for(int i = 0; i < num; i++) {
+                    pointZoomAroundPoint(bezierCurve->points[i], bezierCurve->center, 0.9);
                 }
                 break;
             }
@@ -643,6 +716,13 @@ void selectShape(int x, int y) {
             selectedShape.index = i;
             selectedShape.shape = polygon;
             return;
+        }
+    }
+    for(int i = 0; i < (int)bezierCurves.size();i++) {
+        if (isInsideThePolygon(bezierCurves[i], x, y)) {
+            selectedShape.isSelected = true;
+            selectedShape.index = i;
+            selectedShape.shape = bezierCurve;
         }
     }
 }

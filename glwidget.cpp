@@ -39,7 +39,8 @@ void GLWidget::paintGL() {
         drawOvals();
         drawMypolygons();
         drawCutRect();
-        drawCurves();
+        drawBezierCurves();
+        drawBSplineCurves();
         if(selectedShape.isSelected == true)
             drawHighligh();
         if(curveIsDrawing) {

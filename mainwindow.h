@@ -47,6 +47,8 @@ private slots:
 
     void on_actionbezierCurve_triggered();
 
+    void on_actionbSplineCurve_triggered();
+
 private:
     Ui::MainWindow *ui;
 };

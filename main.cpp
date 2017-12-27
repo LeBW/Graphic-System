@@ -9,7 +9,8 @@ vector<Line> lines;
 vector<Circle> circles;
 vector<Oval> ovals;
 vector<Mypolygon> mypolygons;
-vector<Mypolygon> curves;
+vector<Mypolygon> bezierCurves;
+vector<Mypolygon> bsplineCurves;
 CurrentState currentState = line; //初始状态画直线
 Rect* cutRect = NULL;
 
