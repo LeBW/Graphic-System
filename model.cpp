@@ -398,6 +398,7 @@ void drawMypolygons() {
 }
 void drawHighligh() {
     glPointSize(2);
+    glLineWidth(2);
     switch(selectedShape.shape) {
     case line:
         ddaDrawLine(lines[selectedShape.index].from, lines[selectedShape.index].to);
@@ -419,6 +420,7 @@ void drawHighligh() {
         break;
     }
     glPointSize(1);
+    glLineWidth(1);
 }
 void drawCutRect() {
     if (cutRect != NULL) {
