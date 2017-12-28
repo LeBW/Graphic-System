@@ -45,6 +45,9 @@ public:
     void drawCube();
 
     float xrot = 0, yrot = 0, zrot = 0;
+
+    GLfloat AngleX;
+    GLfloat AngleY;
 };
 
 //定义像素点

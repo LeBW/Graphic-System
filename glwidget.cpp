@@ -76,17 +76,133 @@ void GLWidget::ppmWriter(unsigned char *in, char *name, int dimx, int dimy)
 
 void ThreeDimensionWidget::initializeGL() {
     initializeOpenGLFunctions();
-    glClearColor(0, 0, 0, 1);
-    glOrtho(-4, 4, -3, 3 , -3, 3);
+    AngleX = 45.0f;
+    AngleY = 315.0f;
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DITHER);
+    glShadeModel(GL_SMOOTH);
+
+    int w = WIDTH, h = HEIGHT;
+    GLfloat aspect = (GLfloat)w / (GLfloat)h;
+    GLfloat nRange = 200.0f;
+
+    glViewport(0, 0, w, h);
+
+    glMatrixMode(GL_PROJECTION); //将当前矩阵指定为投影模式
+    glLoadIdentity();
+
+    //设置三维投影区
+
+    if (w <= h)
+    {
+        glOrtho(-nRange, nRange, -nRange * aspect, nRange * aspect, -nRange, nRange);
+    }
+    else
+    {
+        glOrtho(-nRange, nRange, -nRange / aspect, nRange / aspect, -nRange, nRange);
+    }
 }
 void ThreeDimensionWidget::paintGL() {
-    glRotatef(xrot, 1, 0, 0);
-    glRotatef(yrot, 0, 1, 0);
-    glRotatef(zrot, 0, 0, 1);
-    drawCube();
-    xrot = xrot + 0.001;
-    yrot = yrot + 0.001;
-    zrot = zrot + 0.001;
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glPushMatrix();
+    {
+        glRotatef(AngleX, 1.0f, 0.0f, 0.0f);
+        glRotatef(AngleY, 0.0f, 1.0f, 0.0f);
+
+        glBegin(GL_POLYGON); //前表面
+        glColor3ub((GLubyte)255, (GLubyte)255, (GLubyte)255);//颜色设置为白色
+        glVertex3f(50.0f, 50.0f, 50.0f);
+
+        glColor3ub((GLubyte)255, (GLubyte)255, (GLubyte)0);//颜色设置为黄色
+        glVertex3f(50.0f, -50.0f, 50.0f);
+
+        glColor3ub((GLubyte)255, (GLubyte)0, (GLubyte)0);//颜色设置为红色
+        glVertex3f(-50.0f, -50.0f, 50.0f);
+
+        glColor3ub((GLubyte)255, (GLubyte)0, (GLubyte)255);//颜色设置为白色
+        glVertex3f(-50.0f, 50.0f, 50.0f);
+        glEnd();
+
+        glBegin(GL_POLYGON); //后表面
+        glColor3f(0.0f, 1.0f, 1.0f);//颜色设置为青色
+        glVertex3f(50.0f, 50.0f, -50.0f);
+
+        glColor3f(0.0f, 1.0f, 0.0f);//颜色设置为绿色
+        glVertex3f(50.0f, -50.0f, -50.0f);
+
+        glColor3f(0.0f, 0.0f, 0.0f);//颜色设置为黑色
+        glVertex3f(-50.0f, -50.0f, -50.0f);
+
+        glColor3f(0.0f, 0.0f, 1.0f);//颜色设置为蓝色
+        glVertex3f(-50.0f, 50.0f, -50.0f);
+        glEnd();
+
+        glBegin(GL_POLYGON); //上表面
+        glColor3d(0.0, 1.0, 1.0);//颜色设置为青色
+        glVertex3f(50.0f, 50.0f, -50.0f);
+
+        glColor3d(1.0, 1.0, 1.0);//颜色设置为白色
+        glVertex3f(50.0f, 50.0f, 50.0f);
+
+        glColor3d(1.0, 0.0, 1.0);//颜色设置为品红色
+        glVertex3f(-50.0f, 50.0f, 50.0f);
+
+        glColor3d(0.0, 0.0, 1.0);//颜色设置为蓝色
+        glVertex3f(-50.0f, 50.0f, -50.0f);
+        glEnd();
+
+        glBegin(GL_POLYGON); //下表面
+        glColor3ub(0u, 255u, 0u);//颜色设置为绿色
+        glVertex3f(50.0f, -50.0f, -50.0f);
+
+        glColor3ub(255u, 255u, 0u);//颜色设置为黄色
+        glVertex3f(50.0f, -50.0f, 50.0f);
+
+        glColor3ub(255u, 0u, 0u);//颜色设置为红色
+        glVertex3f(-50.0f, -50.0f, 50.0f);
+
+        glColor3ub(0u, 0u, 0u);//颜色设置为黑色
+        glVertex3f(-50.0f, -50.0f, -50.0f);
+        glEnd();
+
+        glBegin(GL_POLYGON); //左表面
+        glColor3ub((GLubyte)255, (GLubyte)255, (GLubyte)255);//颜色设置为白色
+        glVertex3f(50.0f, 50.0f, 50.0f);
+
+        glColor3ub((GLubyte)0, (GLubyte)255, (GLubyte)255);//颜色设置为青色
+        glVertex3f(50.0f, 50.0f, -50.0f);
+
+        glColor3ub((GLubyte)0, (GLubyte)255, (GLubyte)0);//颜色设置为绿色
+        glVertex3f(50.0f, -50.0f, -50.0f);
+
+        glColor3ub((GLubyte)255, (GLubyte)255, (GLubyte)0);//颜色设置为黄色
+        glVertex3f(50.0f, -50.0f, 50.0f);
+        glEnd();
+
+        glBegin(GL_POLYGON); //右表面
+        glColor3f(1.0f, 0.0f, 1.0f);//颜色设置为品红色
+        glVertex3f(-50.0f, 50.0f, 50.0f);
+
+        glColor3f(0.0f, 0.0f, 1.0f);//颜色设置为蓝色
+        glVertex3f(-50.0f, 50.0f, -50.0f);
+
+        glColor3f(0.0f, 0.0f, 0.0f);//颜色设置为黑色
+        glVertex3f(-50.0f, -50.0f, -50.0f);
+
+        glColor3f(1.0f, 0.0f, 0.0f);//颜色设置为红色
+        glVertex3f(-50.0f, -50.0f, 50.0f);
+        glEnd();
+    }
+    glPopMatrix();
+    AngleX += 5;
+    AngleY -= 5;
 }
 
 void ThreeDimensionWidget::drawCube() {
